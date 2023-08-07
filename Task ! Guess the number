@@ -1,0 +1,84 @@
+package CipherByte;
+
+import java.util.Random;
+import javax.swing.JOptionPane;
+
+public class GuessNumber {
+    public static void main(String[] args) {
+        int minRange = 1;
+        int maxRange = 100;
+        int maxAttempts = 10;
+        int round = 1;
+        int totalScore = 0;
+
+        JOptionPane.showMessageDialog(null, "Welcome to Guess the Number Game!");
+
+        // Main game loop
+        while (true) {
+            JOptionPane.showMessageDialog(null, "Round " + round);
+            int randomNumber = generateRandomNumber(minRange, maxRange);
+            int attempts = 0;
+
+            while (true) {
+                int userGuess = getUserGuess(minRange, maxRange);
+
+                attempts++;
+
+                if (userGuess == randomNumber) {
+                    int roundScore = calculateRoundScore(maxAttempts, attempts);
+                    totalScore += roundScore;
+                    JOptionPane.showMessageDialog(null, "Congratulations! You guessed the number " + randomNumber + " in " + attempts + " attempts.\nRound Score: " + roundScore + "\nTotal Score: " + totalScore);
+                    break;
+                } else {
+                    String message = (userGuess < randomNumber) ? "Try a higher number." : "Try a lower number.";
+
+                    if (attempts >= maxAttempts) {
+                        JOptionPane.showMessageDialog(null, "Sorry, you've reached the maximum number of attempts.\nThe number was: " + randomNumber + "\nRound Score: 0\nTotal Score: " + totalScore);
+                        break;
+                    } else {
+                        JOptionPane.showMessageDialog(null, message + "\nAttempts left: " + (maxAttempts - attempts));
+                    }
+                }
+            }
+
+            int playAgain = JOptionPane.showConfirmDialog(null, "Do you want to play again?", "Play Again?", JOptionPane.YES_NO_OPTION);
+            if (playAgain == JOptionPane.NO_OPTION) {
+                break;
+            } else {
+                round++;
+            }
+        }
+
+        JOptionPane.showMessageDialog(null, "Thank you for playing Guess the Number Game!\nFinal Score: " + totalScore);
+    }
+
+    public static int generateRandomNumber(int min, int max) {
+        Random random = new Random();
+        return random.nextInt(max - min + 1) + min;
+    }
+
+    public static int getUserGuess(int min, int max) {
+        String input = JOptionPane.showInputDialog("Guess the number between " + min + " and " + max + ":");
+        try {
+            int guess = Integer.parseInt(input);
+            if (guess < min || guess > max) {
+                JOptionPane.showMessageDialog(null, "Please enter a number within the specified range.");
+                return getUserGuess(min, max);
+            }
+            return guess;
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number.");
+            return getUserGuess(min, max);
+        }
+    }
+
+    public static int calculateRoundScore(int maxAttempts, int attempts) {
+        int maxScore = 1000; // Maximum score for a round
+        int minScore = 100;  // Minimum score for a round
+
+        // Calculate score based on attempts (more attempts yield lower scores)
+        double score = ((double) (maxAttempts - attempts) / maxAttempts) * (maxScore - minScore) + minScore;
+        return (int) score;
+    }
+}
+
